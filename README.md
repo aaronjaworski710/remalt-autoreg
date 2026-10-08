@@ -36,9 +36,20 @@ Remalt.com (AI content workspace, 15+ LLMs) — массовый авторег 
 
 ## Файлы
 
-- `remalt_autoreg.py` — авторег N акков (stdlib only, Python 3.9+): `python remalt_autoreg.py 5`
+- `remalt_autoreg.py` — авторег N акков (stdlib only, Python 3.9+): `python remalt_autoreg.py 5 [--threads 4] [--validate] [--stats]`
+- `remalt_trial.py` — активатор Stripe-триала (7 дней): sign-in API → модалка на /pricing → Stripe Elements iframes (number/expiry/cvc + address) → hCaptcha-гейт (mouse-click по чекбоксу) → verify /api/stripe/subscription. Карта из локального `cards.json` (в репо НЕ хранится). Usage: `python remalt_trial.py [card_index] [email]`
+- `remalt_gateway.py` — OpenAI-compatible шлюз поверх пула акков (stdlib only, порт 8400): `/v1/models`, `/v1/chat/completions` (только план-акки, failover по пулу), `/v1/analyze` (бесплатный webpage/analyze без плана), `/` дашборд. Ключ: env `REMALT_GATEWAY_KEY` или `gateway_key.txt`. Фоновый монитор плана каждые 5 мин через `/api/stripe/subscription`.
 - `trial_probe.py` — разведка баланса/гейтов/триал-эндпоинтов по session token
-- `rzp_camoufox.py` — заглушка флоу Razorpay checkout через camoufox (карта подставляется локально, в репо не хранится)
+- `rzp_camoufox.py` — старый флоу Razorpay checkout (deprecated — Razorpay-кнопка убрана с /pricing, остался только Stripe)
+
+## Триал (проверено 2026-10)
+
+- Кнопка `Start Starter trial` на /pricing открывает **встроенную модалку** (не редирект): Stripe Elements в iframes `js.stripe.com/v3/elements-inner-payment-*` (name=number/expiry/cvc) и `elements-inner-address-*` (name/country/addressLine1/locality/administrativeArea/postalCode)
+- Сабмит: кнопка `Start free trial`; при submit Stripe эскалирует invisible hCaptcha → модалка «One more step... I am human» (iframe `newassets.hcaptcha.com`)
+- hCaptcha-чекбокс кликается только **мышью по абсолютным координатам** iframe (locator.click внутри вложенного фрейма висит)
+- `/c/pay` hosted-checkout (из `/api/stripe/checkout`) — мёртвый путь: submit блокируется PerimeterX (`px-cdn.net` CORS-коллектор), карта не отправляется
+- Карта отклоняется → красный «An error occurred while processing your card», модалка закрывается сама = признак declines/успеха, проверять `/api/stripe/subscription`
+- Кулдаун акка: после 2-3 неудачных сабмитов модалка перестаёт открываться (~10+ мин) — ротировать акки из пула
 
 ## Питфолы
 
