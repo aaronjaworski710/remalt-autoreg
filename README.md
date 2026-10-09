@@ -51,7 +51,7 @@ Remalt.com (AI content workspace, 15+ LLMs) — массовый авторег 
 
 ### Ядро
 - `remalt_autoreg.py` — авторег N акков (stdlib only, Python 3.9+): `python remalt_autoreg.py 5 [--threads 4] [--validate] [--stats]`
-- `remalt_trial.py` / `remalt_trial2.py` — активатор Stripe-триала: sign-in API → модалка на /pricing → Stripe Elements iframes (number/expiry/cvc + address) → hCaptcha-гейт (mouse-click по чекбоксу) → verify /api/stripe/subscription. Карта из локального `cards.json`/`cards_live.json` (в репо НЕ хранится). Usage: `python remalt_trial.py [card_index] [email]`
+- `remalt_trial.py` — активатор Stripe-триала: sign-in API → модалка на /pricing → Stripe Elements iframes (number/expiry/cvc + address) → hCaptcha-гейт (mouse-click по чекбоксу) → verify /api/stripe/subscription. Карта из локального `cards.json`/`cards_live.json` (в репо НЕ хранится). Usage: `python remalt_trial.py [card_index] [email]`
 - `remalt_gateway.py` — OpenAI-compatible шлюз поверх пула акков (stdlib only, порт 8400): `/v1/models`, `/v1/chat/completions` (только план-акки, failover по пулу), `/v1/analyze` (бесплатный webpage/analyze без плана), `/` дашборд. Ключ: env `REMALT_GATEWAY_KEY` или `gateway_key.txt`. Фоновый монитор плана каждые 5 мин через `/api/stripe/subscription`.
 - `gen_check.py` — генератор карт из BIN (Luhn) + чекер через Stripe `/v1/payment_methods`. Usage: `STRIPE_PK=pk_live_xxx python gen_check.py 20` → `cards_live.json` (LIVE = токенизируется, не гарантия баланса).
 

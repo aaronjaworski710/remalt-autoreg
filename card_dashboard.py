@@ -229,7 +229,7 @@ class H(BaseHTTPRequestHandler):
             env.pop("PYTHONPATH", None)
             logf = open(HERE / "trial.log", "ab")
             p = subprocess.Popen(
-                [py, "-X", "utf8", "-u", str(HERE / "remalt_trial2.py"), str(idx), email],
+                [py, "-X", "utf8", "-u", str(HERE / "remalt_trial.py"), str(idx), email],
                 stdout=logf, stderr=logf, env=env, cwd=str(HERE))
             self._send(200, {"ok": True, "pid": p.pid})
         else:
