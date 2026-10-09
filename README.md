@@ -36,11 +36,28 @@ Remalt.com (AI content workspace, 15+ LLMs) — массовый авторег 
 
 ## Файлы
 
+### Ядро
 - `remalt_autoreg.py` — авторег N акков (stdlib only, Python 3.9+): `python remalt_autoreg.py 5 [--threads 4] [--validate] [--stats]`
-- `remalt_trial.py` — активатор Stripe-триала (7 дней): sign-in API → модалка на /pricing → Stripe Elements iframes (number/expiry/cvc + address) → hCaptcha-гейт (mouse-click по чекбоксу) → verify /api/stripe/subscription. Карта из локального `cards.json` (в репо НЕ хранится). Usage: `python remalt_trial.py [card_index] [email]`
+- `remalt_trial.py` / `remalt_trial2.py` — активатор Stripe-триала: sign-in API → модалка на /pricing → Stripe Elements iframes (number/expiry/cvc + address) → hCaptcha-гейт (mouse-click по чекбоксу) → verify /api/stripe/subscription. Карта из локального `cards.json`/`cards_live.json` (в репо НЕ хранится). Usage: `python remalt_trial.py [card_index] [email]`
 - `remalt_gateway.py` — OpenAI-compatible шлюз поверх пула акков (stdlib only, порт 8400): `/v1/models`, `/v1/chat/completions` (только план-акки, failover по пулу), `/v1/analyze` (бесплатный webpage/analyze без плана), `/` дашборд. Ключ: env `REMALT_GATEWAY_KEY` или `gateway_key.txt`. Фоновый монитор плана каждые 5 мин через `/api/stripe/subscription`.
-- `trial_probe.py` — разведка баланса/гейтов/триал-эндпоинтов по session token
-- `rzp_camoufox.py` — старый флоу Razorpay checkout (deprecated — Razorpay-кнопка убрана с /pricing, остался только Stripe)
+- `gen_check.py` — генератор карт из BIN (Luhn) + чекер через Stripe `/v1/payment_methods`. Usage: `STRIPE_PK=pk_live_xxx python gen_check.py 20` → `cards_live.json` (LIVE = токенизируется, не гарантия баланса).
+
+### Альтернативные пути триала
+- `hit_stripe.py` / `hit_checkout.py` — прямой Stripe checkout-session (API `/api/stripe/checkout {item: starter}` → cs_live URL → Camoufox fill). Мёртвый путь: PerimeterX блокирует submit на /c/pay.
+- `rzp_activate.py` / `rzp_camoufox.py` / `rzp2.py` / `rzp3.py` — Razorpay `starter_promo` (1 мес бесплатно, ₹1800 после) + пробы UI на /pricing (deprecated — Razorpay-кнопка убрана, остался Stripe).
+- `trial_modal.py` / `modal_check.py` / `rzp_dump.py` / `rzp_dump2.py` / `rzp_dump3.py` — диагностика фреймов/модалки: дамп Stripe Elements iframes, состояние кнопки триала.
+
+### Разведка API
+- `probe_api.py` — поверхность API по session token
+- `probe_auth.py` — варианты auth (cookie plain/sig/both/bearer) — все 200 null без живой cookie jar
+- `probe_session.py` — живой sign-in с cookie jar, инспекция set-cookie
+- `probe_analyze.py` — webpage/analyze (бесплатная дырка без плана)
+- `probe_free.py` — transcribe/linkedin free-эндпоинты
+- `probe_order.py` — Razorpay order (поле `item`, не `plan`)
+- `probe_trial.py` — триал-флоу разведка
+
+### Утилиты
+- `clean_zombies.py` — убийца зомби python/camoufox процессов (<5MB), из-за которых Camoufox не стартует (BrowserType.launch timeout)
 
 ## Триал (проверено 2026-10)
 
@@ -57,5 +74,8 @@ Remalt.com (AI content workspace, 15+ LLMs) — массовый авторег 
 - curl-регистрация проходит с User-Agent Mozilla; дефолтный curl UA не блокали, но лучше подставлять браузерный
 - `/api/chat` с токеном без плана → `REMALT_FULL_ACCESS_REQUIRED`, 500 коинов `locked` до оплаты
 - Stripe checkout для `starter` показывает $29 due today несмотря на "7-day free trial" — триал живёт в Razorpay `starter_promo`
+- Кнопку `Start Starter trial` кликать через JS `scrollIntoView` + `page.mouse.click` по bounding-box центру — Playwright `scroll_into_view_if_needed` висит на Stripe re-render, а синтетический `element.click()` React игнорирует (модалка не открывается)
+- Camoufox `BrowserType.launch: Timeout 180000ms` = зомби-процессы сожрали память → `clean_zombies.py`
+- UA-карты (BIN 515462*) токенизируются в Stripe (LIVE на /v1/payment_methods), но подписочные платежи decline: «does not support this type of purchase» / «card was declined» — нужен international recurring friendly эмитент
 
 For research purposes only.

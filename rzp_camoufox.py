@@ -4,9 +4,9 @@ import json, time, pathlib, sys
 from camoufox.sync_api import Camoufox
 
 T = pathlib.Path("C:/Users/User/AppData/Local/Temp")
-SHOTS = pathlib.Path(__file__).parent/"shots_rzp"; SHOTS.mkdir(exist_ok=True)
+SHOTS = pathlib.Path("C:/Users/User/tmp/remalt/shots_rzp"); SHOTS.mkdir(exist_ok=True)
 order = json.load(open(T/"remalt_rzp_order.json"))
-card = json.load(open(str(pathlib.Path(__file__).parent/"card.json")))
+card = json.load(open("C:/Users/User/tmp/remalt/card.json"))
 
 JS_SETUP = """
 (cfg) => {
@@ -55,7 +55,7 @@ with Camoufox(headless=False, geoip=False) as browser:
     page = browser.new_page()
     # login with session cookie: set better_auth cookie via sign-in from browser fetch
     page.goto("https://remalt.com/auth/signin", timeout=60000, wait_until="domcontentloaded")
-    acc = json.loads(open(str(pathlib.Path(__file__).parent/"accounts.jsonl"), encoding="utf-8").readlines()[-1])
+    acc = json.loads(open("C:/Users/User/tmp/remalt/accounts.jsonl", encoding="utf-8").readlines()[-1])
     signin = page.evaluate("""async (a) => {
         const r = await fetch('/api/auth/sign-in/email', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(a)});
         return (await r.text()).slice(0,150);
