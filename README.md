@@ -58,6 +58,8 @@ Remalt.com (AI content workspace, 15+ LLMs) — массовый авторег 
 
 ### Утилиты
 - `clean_zombies.py` — убийца зомби python/camoufox процессов (<5MB), из-за которых Camoufox не стартует (BrowserType.launch timeout)
+- `card_dashboard.py` — веб-дахшорд для карт (stdlib, порт 8500): добавление карт вручную, генерация из любого BIN (Luhn), Stripe-чек по одной/всем, выбор аккаунта и запуск триала кнопкой, лог в реальном времени. Usage: `python card_dashboard.py` → http://127.0.0.1:8500
+- `bins_catalog.json` — каталог рабочих BIN (MC/AMEX, привязка к таргетам) + 12 сгенерированных примеров карт
 
 ## Триал (проверено 2026-10)
 
