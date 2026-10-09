@@ -50,6 +50,8 @@ Remalt.com (AI content workspace, 15+ LLMs) — массовый авторег 
 ## Файлы
 
 ### Ядро
+- `probe_full.py` — полный реверс API: 22 GET-эндпоинта + POST-пробы всех фич (chat/image/linkedin/transcribe/analyze)
+- `probe_chat.py` — chat API shape (OpenAI-style `messages[]`) по всем моделям
 - `remalt_autoreg.py` — авторег N акков (stdlib only, Python 3.9+): `python remalt_autoreg.py 5 [--threads 4] [--validate] [--stats]`
 - `remalt_trial.py` — активатор Stripe-триала: sign-in API → модалка на /pricing → Stripe Elements iframes (number/expiry/cvc + address) → hCaptcha-гейт (mouse-click по чекбоксу) → verify /api/stripe/subscription. Карта из локального `cards.json`/`cards_live.json` (в репо НЕ хранится). Usage: `python remalt_trial.py [card_index] [email]`
 - `remalt_gateway.py` — OpenAI-compatible шлюз поверх пула акков (stdlib only, порт 8400): `/v1/models`, `/v1/chat/completions` (только план-акки, failover по пулу), `/v1/analyze` (бесплатный webpage/analyze без плана), `/` дашборд. Ключ: env `REMALT_GATEWAY_KEY` или `gateway_key.txt`. Фоновый монитор плана каждые 5 мин через `/api/stripe/subscription`.
