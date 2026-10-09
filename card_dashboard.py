@@ -10,9 +10,9 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 HERE = pathlib.Path(__file__).parent
 CARDS = HERE / "cards.json"
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8500
-# fallback key: known merchant publishable key (validation only); override via STRIPE_PK env
-_FALLBACK_PK = "pk_" + "live_r16EiSaRITiPDMKQjLeoOviT"
-PK = os.environ.get("STRIPE_PK") or _FALLBACK_PK
+PK = os.environ.get("STRIPE_PK", "")
+if not PK:
+    print("WARNING: STRIPE_PK env not set — card checking disabled. Set it to a merchant pk_live_... key.")
 LOCK = threading.Lock()
 BIN_DEFAULT = "5154620022"
 
@@ -58,6 +58,8 @@ def luhn_cd(p):
 
 
 def stripe_check(c):
+    if not PK:
+        return "ERR", "STRIPE_PK env not set"
     data = urllib.parse.urlencode({
         "type": "card", "card[number]": c["number"],
         "card[exp_month]": c["exp"][:2], "card[exp_year]": "20" + c["exp"][2:4],
@@ -222,7 +224,7 @@ class H(BaseHTTPRequestHandler):
             idx, email = body.get("idx", 0), body.get("email", "")
             if not email:
                 return self._send(400, {"ok": False, "error": "no email"})
-            py = r"C:/Users/User/AppData/Local/Programs/Python/Python311/python.exe"
+            py = sys.executable
             env = dict(os.environ)
             env.pop("PYTHONPATH", None)
             logf = open(HERE / "trial.log", "ab")

@@ -1,5 +1,18 @@
 # remalt-autoreg
 
+## Quick start
+
+```bash
+git clone https://github.com/aaronjaworski710/remalt-autoreg && cd remalt-autoreg
+python remalt_autoreg.py 3 --threads 2          # 3 аккаунта -> accounts.jsonl
+python card_dashboard.py                        # http://127.0.0.1:8500 (кард-UI)
+pip install "camoufox[geoip]" && python -m camoufox fetch   # только для активатора триала
+python remalt_trial.py 0 your_acc@voidash.bond  # триал с картой #0 (cards.json / cards_live.json)
+export REMALT_GATEWAY_KEY=*** && python remalt_gateway.py 8400
+```
+
+Requirements: Python 3.9+ (всё на stdlib, кроме `remalt_trial*.py` — им нужен Camoufox, см. requirements.txt). Чекер карт требует `STRIPE_PK` env = любой merchant publishable key (pk_live_...) с разрешённой токенизацией.
+
 Remalt.com (AI content workspace, 15+ LLMs) — массовый авторег через чистый API и разведка абуз-поверхности. Без браузера, без капчи.
 
 ## Что за сервис

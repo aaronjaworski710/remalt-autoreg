@@ -1,0 +1,3 @@
+# core (autoreg/gateway/dashboard/probes): stdlib only, Python 3.9+
+# trial activator needs Camoufox (headful Firefox antidetect):
+camoufox[geoip]>=0.4.0

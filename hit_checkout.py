@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-import json, sys, time, pathlib
+import tempfile, json, sys, time, pathlib
 from camoufox.sync_api import Camoufox
 
-T = pathlib.Path("C:/Users/User/AppData/Local/Temp")
+T = pathlib.Path(tempfile.gettempdir())
 url = open(T / "remalt_checkout_url.txt").read().strip()
-card = json.load(open("C:/Users/User/tmp/remalt/card.json"))
+card = json.load(open(pathlib.Path(__file__).parent / "cards.json"))
 
-shots = pathlib.Path("C:/Users/User/tmp/remalt/shots")
+shots = pathlib.Path(__file__).parent / "shots"
 shots.mkdir(exist_ok=True)
 
 with Camoufox(headless=False, geoip=False) as browser:

@@ -64,8 +64,10 @@ if __name__ == "__main__":
     pk, src = find_pk()
     print("pk from remalt:", (pk[:20] + "...") if pk else None, src)
     if not pk:
-        pk = os.environ.get("STRIPE_PK", "")  # set STRIPE_PK to a merchant publishable key for validation
-        print("fallback pk (validate-only)")
+        pk = os.environ.get("STRIPE_PK", "")
+        if not pk:
+            sys.exit("ERROR: set STRIPE_PK env to a merchant publishable key (pk_live_...) that allows tokenization.\n"
+                     "Example: export STRIPE_PK=pk_live_xxxxxxxx")
     cards = gen_cards(n)
     results = []
     lock = threading.Lock()
