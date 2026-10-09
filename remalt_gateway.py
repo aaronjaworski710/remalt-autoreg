@@ -185,8 +185,12 @@ class H(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/":
+            if not self._auth():
+                return self._send(401, {"error": {"message": "invalid key", "type": "auth"}})
             with _lock:
-                view = [{k: v for k, v in p.items() if k != "opener"} for p in _pool.values()]
+                view = [{k: v for k, v in p.items()
+                         if k not in ("opener", "password", "token", "session_token")}
+                        for p in _pool.values()]
             self._send(200, {"service": "remalt-gateway", "stats": _stats,
                              "pool": view, "models": MODELS,
                              "note": "chat needs plan/trial account; analyze is free"})
@@ -240,7 +244,7 @@ class H(BaseHTTPRequestHandler):
             last = f"{p['email']}: {s} {b[:150]}"
             if s in (401, 403):
                 p["signed_in"] = False
-        self._send(502, {"error": "all accounts failed: " + last})
+        self._send(502, {"error": "all accounts failed (upstream plan-gated or network error)"})
 
     def _handle_chat(self):
         try:
